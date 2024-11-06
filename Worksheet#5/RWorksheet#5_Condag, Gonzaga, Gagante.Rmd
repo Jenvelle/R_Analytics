@@ -15,11 +15,83 @@ library(polite)
 
 polite::use_manners(save_as = 'polite_scrape.R')
 
+url <- 'https://www.imdb.com/chart/top/?ref_=nv_mv_250&sort=rank%2Casc'
+
+session <- bow(url,
+               user_agent = "Educational")
+session
+```
+
+```{r}
+rank_title <- character(0)
+links <- character(0)
+
+title_list2 <- read_html(url) %>%
+  html_nodes('h3.ipc-title__text') %>%
+  html_text
+```
+
+
+```{r}
+library(httr)
+library(polite)
+
+polite::use_manners(save_as = 'polite_scrape.R')
+
 url <- 'https://www.amazon.com/'
 
 
 session <- bow(url,
                user_agent = "Educational")
 session
+```
+# Extracting Amazon Product Reviews
+4. Select 5 categories from Amazon and select 30 products from each category.
+
+5. Extract the price, description, ratings and reviews of each product.
+```{r}
+library(rvest)
+library(dplyr)
+polite::use_manners(save_as = 'polite_scrape.R')
+
+url <- 'https://www.amazon.com/Beauty-Makeup-Skin-Hair-Products/b?ie=UTF8&node=3760911'
+
+
+session <- bow(url,
+               user_agent = "Educational")
+session
+
+makeup <- 'https://www.amazon.com/s?rh=n%3A3760911%2Cn%3A11058281&dc&qid=1730856752&rnid=3760911&ref=sr_nr_n_1'
+```
+
+```{r}
+page <- read_html(makeup)
+price <- page %>% html_nodes ('.a-price .a-offscreen') %>% html_text ()
+description <- page %>% html_nodes('#titleSection') %>% html_text()
+ratings <- page %>% html_nodes ('span.a-icon-alt') %>% html_text ()
+reviews <- page %>% html_nodes ('#acrCustomerReviewText') %>% html_text()
+
+price <- price[1:30]
+description <- description[1:30]
+ratings <- ratings[1:30]
+reviews <- reviews[1:30]
+
+print (paste( "Price: " ,  price))
+print(paste("Description: ", description))
+print (paste("Ratings: ", ratings))
+print (paste("Reviews: ", reviews))
+
+
+
+
+```
+
+6. Describe the data you have extracted.
+7. What will be your use case for the data you have extracted?
+8. Create graphs regarding the use case. And briefly explain it.
+9. Graph the price and the ratings for each category. Use basic plotting functions and ggplot2 package.
+10. Rank the products of each category by price and ratings. Explain briefly.
+```{r}
+page <- read_html(url)
 ```
 
