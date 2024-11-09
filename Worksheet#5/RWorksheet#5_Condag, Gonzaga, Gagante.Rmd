@@ -10,6 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
+library(rvest)
+library(dplyr)
 library(httr)
 library(polite)
 
@@ -23,8 +25,9 @@ session
 ```
 
 ```{r}
-rank_title <- character(0)
-links <- character(0)
+title <- character(0)
+rating <- character(0)
+rank <- character(0)
 
 title_list2 <- read_html(url) %>%
   html_nodes('h3.ipc-title__text') %>%
@@ -45,8 +48,52 @@ session <- bow(url,
                user_agent = "Educational")
 session
 ```
-# Extracting Amazon Product Reviews
+
 4. Select 5 categories from Amazon and select 30 products from each category.
+
+
+```{r}
+library(rvest)
+library(dplyr)
+
+Shoes <- 'https://www.amazon.com/s?k=shoes&i=fashion-womens-intl-ship&crid=31A4H0KY2V228&sprefix=shoes%2Cfashion-womens-intl-ship%2C357&ref=nb_sb_ss_p13n-conservative-preferred-department-reranking_1_5'
+makeup <- 'https://www.amazon.com/s?k=makeup&i=beauty-intl-ship&crid=3A9DKM1NJH3QQ&sprefix=make%2Cbeauty-intl-ship%2C325&ref=nb_sb_ss_ts-doa-p_1_4'
+jewelry <- 'https://www.amazon.com/s?i=specialty-aps&bbn=16225018011&rh=n%3A7141123011%2Cn%3A16225018011%2Cn%3A7192394011&ref=nav_em__nav_desktop_sa_intl_jewelry_0_2_12_4'
+girls_clothing <- 'https://www.amazon.com/s?i=specialty-aps&bbn=16225020011&rh=n%3A7141123011%2Cn%3A16225020011%2Cn%3A1040664&ref=nav_em__nav_desktop_sa_intl_clothing_0_2_14_2'
+babytoys <- 'https://www.amazon.com/s?i=specialty-aps&bbn=16225005011&rh=n%3A%2116225005011%2Cn%3A196601011&ref=nav_em__nav_desktop_sa_intl_baby_toddler_toys_0_2_10_4'
+
+scrape_amazon_products <- function(url, category) {
+  # Read the page content
+  page <- read_html(url)
+  
+  product_titles <- page %>%
+    html_nodes("span.a-text-normal") %>%  # This is a more general class for titles
+    html_text(trim = TRUE)
+  
+  product_titles <- head(product_titles, 30)
+  
+  data <- data.frame(
+    Category = rep(category, length(product_titles)),  # Repeat category name for each product
+    ProductTitle = product_titles
+  )
+  
+  return(data)
+}
+
+shoes_products <- scrape_amazon_products(Shoes, "Shoes")
+makeup_products <- scrape_amazon_products(makeup, "Makeup")
+jewelry_products <- scrape_amazon_products(jewelry, "Jewelry")
+girls_clothing <- scrape_amazon_products(girls_clothing, "Girls Clothing")
+baby_toys <- scrape_amazon_products(babytoys, "Baby Toys")
+
+head(shoes_products, 30)
+head(makeup_products, 30)
+head(jewelry_products, 30)
+head(girls_clothing, 30)
+head(babytoys, 30)
+
+
+```
 
 5. Extract the price, description, ratings and reviews of each product.
 ```{r}
