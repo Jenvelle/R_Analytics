@@ -49,7 +49,7 @@ session <- bow(url,
 session
 ```
 
-4. Select 5 categories from Amazon and select 30 products from each category.
+4 and 5. Select 5 categories from Amazon and select 30 products from each category. Extract the price, description, ratings and reviews of each product.
 
 
 ```{r}
@@ -67,14 +67,27 @@ scrape_amazon_products <- function(url, category) {
   page <- read_html(url)
   
   product_titles <- page %>%
-    html_nodes("span.a-text-normal") %>%  # This is a more general class for titles
+    html_nodes("span.a-text-normal") %>% 
+    html_text(trim = TRUE)
+  
+  price <- page %>% 
+    html_nodes('.a-price .a-offscreen') %>% 
+    html_text(trim = TRUE)
+  
+  ratings <- page %>% 
+    html_nodes('span.a-icon-alt') %>% 
     html_text(trim = TRUE)
   
   product_titles <- head(product_titles, 30)
+  price <- head(price, 30)
+  ratings <- head(ratings, 30)
+  
   
   data <- data.frame(
-    Category = rep(category, length(product_titles)),  # Repeat category name for each product
-    ProductTitle = product_titles
+    Category = rep(category, 30),
+    Price = price,
+    ProductTitle = product_titles,
+    Ratings = ratings
   )
   
   return(data)
@@ -90,55 +103,14 @@ head(shoes_products, 30)
 head(makeup_products, 30)
 head(jewelry_products, 30)
 head(girls_clothing, 30)
-head(babytoys, 30)
+head(baby_toys, 30)
 
 
 ```
-
-5. Extract the price, description, ratings and reviews of each product.
-```{r}
-library(rvest)
-library(dplyr)
-polite::use_manners(save_as = 'polite_scrape.R')
-
-url <- 'https://www.amazon.com/Beauty-Makeup-Skin-Hair-Products/b?ie=UTF8&node=3760911'
-
-
-session <- bow(url,
-               user_agent = "Educational")
-session
-
-makeup <- 'https://www.amazon.com/s?rh=n%3A3760911%2Cn%3A11058281&dc&qid=1730856752&rnid=3760911&ref=sr_nr_n_1'
-```
-
-```{r}
-page <- read_html(makeup)
-price <- page %>% html_nodes ('.a-price .a-offscreen') %>% html_text ()
-description <- page %>% html_nodes('#titleSection') %>% html_text()
-ratings <- page %>% html_nodes ('span.a-icon-alt') %>% html_text ()
-reviews <- page %>% html_nodes ('#acrCustomerReviewText') %>% html_text()
-
-price <- price[1:30]
-description <- description[1:30]
-ratings <- ratings[1:30]
-reviews <- reviews[1:30]
-
-print (paste( "Price: " ,  price))
-print(paste("Description: ", description))
-print (paste("Ratings: ", ratings))
-print (paste("Reviews: ", reviews))
-
-
-
-
-```
-
 6. Describe the data you have extracted.
 7. What will be your use case for the data you have extracted?
 8. Create graphs regarding the use case. And briefly explain it.
 9. Graph the price and the ratings for each category. Use basic plotting functions and ggplot2 package.
 10. Rank the products of each category by price and ratings. Explain briefly.
-```{r}
-page <- read_html(url)
-```
+
 
